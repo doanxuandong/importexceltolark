@@ -35,8 +35,7 @@ app.post('/import', upload.single('file'), async (req, res) => {
       },
     });
     const tableFields = fieldsRes.data.items;
-    const numberFields = ['Năm', 'Tháng', 'Số vote']; // Chỉ các trường thực sự là Number
-
+    const numberFields = ['Số lượng 1', 'Số lượng 2', 'Đơn giá'];
     // Import từng dòng
     for (const record of jsonData) {
       const fields = {};
