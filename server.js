@@ -18,6 +18,7 @@ const config = {
 const client = new Client({
   appId: config.APP_ID,
   appSecret: config.APP_SECRET,
+  domain: 'https://open.feishu.cn'
 });
 
 app.post('/import', upload.single('file'), async (req, res) => {
@@ -26,6 +27,10 @@ app.post('/import', upload.single('file'), async (req, res) => {
     const workbook = XLSX.read(req.file.buffer, { type: 'buffer' });
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+    // Lấy thông tin người import
+    const importedBy = req.body.importedBy || 'Unknown';
+    const fileName = req.file.originalname || 'Unknown';
 
     // Lấy fields của bảng
     const fieldsRes = await client.bitable.appTableField.list({
@@ -36,9 +41,15 @@ app.post('/import', upload.single('file'), async (req, res) => {
     });
     const tableFields = fieldsRes.data.items;
     const numberFields = ['Số lượng 1', 'Số lượng 2', 'Đơn giá'];
+
     // Import từng dòng
     for (const record of jsonData) {
       const fields = {};
+      
+      // Thêm tên người import
+      fields['Người push'] = importedBy;
+      fields['Tên file'] = fileName;
+
       for (const field of tableFields) {
         const excelColumn = Object.keys(record).find(
           key => key.toLowerCase() === field.field_name.toLowerCase()
@@ -62,6 +73,7 @@ app.post('/import', upload.single('file'), async (req, res) => {
           fields[field.field_name] = value;
         }
       }
+
       console.log('Importing record:', fields);
       try {
         const result = await client.bitable.appTableRecord.create({

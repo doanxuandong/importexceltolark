@@ -6,6 +6,7 @@ const ExcelImporter = () => {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [importedBy, setImportedBy] = useState('');
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -23,6 +24,11 @@ const ExcelImporter = () => {
       return;
     }
 
+    if (!importedBy.trim()) {
+      setError('Please enter your name');
+      return;
+    }
+
     setImporting(true);
     setProgress(0);
     setError(null);
@@ -31,6 +37,7 @@ const ExcelImporter = () => {
     try {
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('importedBy', importedBy.trim());
 
       const response = await fetch('http://localhost:3001/import', {
         method: 'POST',
@@ -57,11 +64,25 @@ const ExcelImporter = () => {
           <div className="max-w-md mx-auto">
             <div className="divide-y divide-gray-200">
               <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
-                <h1 className="text-3xl font-bold text-blue-600 mb-4">
-                  Excel to Lark Base Importer
+                <h1 className="text-3xl font-bold text-blue-600 mb-4 text-center">
+                  UPLOAD CO
                 </h1>
                 
                 <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      Your Name
+                    </label>
+                    <input
+                      type="text"
+                      value={importedBy}
+                      onChange={(e) => setImportedBy(e.target.value)}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                      placeholder="Enter your name"
+                      disabled={importing}
+                    />
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       Select Excel File
