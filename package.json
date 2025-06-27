@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.0.0",
     "@azure/msal-node": "^3.6.1",
     "@larksuiteoapi/node-sdk": "^1.50.0",
     "@microsoft/microsoft-graph-client": "^3.0.7",
